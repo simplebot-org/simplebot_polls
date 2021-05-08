@@ -1,1 +1,3 @@
 pytest==6.2.2
+# deltachat tests dep:
+requests==2.25.1
