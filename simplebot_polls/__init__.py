@@ -1,8 +1,9 @@
+"""hooks, commands and filters definition."""
+
 import os
-import time
 
 import simplebot
-from deltachat import Chat, Contact, Message
+from deltachat import Message
 from pkg_resources import DistributionNotFound, get_distribution
 from simplebot import DeltaBot
 from simplebot.bot import Replies
@@ -59,10 +60,10 @@ def deltabot_start(bot: DeltaBot) -> None:
 
 def poll_new(bot: DeltaBot, payload: str, message: Message, replies: Replies) -> None:
     lines = []
-    for ln in payload.split("\n"):
-        ln = ln.strip()
-        if ln:
-            lines.append(ln)
+    for line in payload.split("\n"):
+        line = line.strip()
+        if line:
+            lines.append(line)
 
     if len(lines) < 3:
         replies.add(text="❌ Invalid poll, at least two options needed")
@@ -74,8 +75,8 @@ def poll_new(bot: DeltaBot, payload: str, message: Message, replies: Replies) ->
     for i, opt in enumerate(lines, 1):
         poll.options.append(Option(id=i, text=opt))
     with session_scope() as session:
-        session.add(poll)
-        session.flush()
+        session.add(poll)  # noqa
+        session.flush()  # noqa
         text, html = _format_poll(bot, poll)
     replies.add(text=text, html=html)
 
@@ -86,7 +87,7 @@ def poll_get(bot: DeltaBot, args: str, message: Message, replies: Replies) -> No
         try:
             with session_scope() as session:
                 text, html = _format_poll(
-                    bot, session.query(Poll).filter_by(id=int(args[0])).one()
+                    bot, session.query(Poll).filter_by(id=int(args[0])).one()  # noqa
                 )
             replies.add(text=text, html=html)
         except NoResultFound:
@@ -101,7 +102,7 @@ def poll_status(bot: DeltaBot, args: str, message: Message, replies: Replies) ->
     if args:
         try:
             with session_scope() as session:
-                poll = session.query(Poll).filter_by(id=int(args[0])).one()
+                poll = session.query(Poll).filter_by(id=int(args[0])).one()  # noqa
                 is_admin = addr == poll.addr
                 voted = is_admin or addr in [v.addr for v in poll.votes]
                 if voted:
@@ -125,13 +126,13 @@ def poll_list(bot: DeltaBot, message: Message, replies: Replies) -> None:
     with session_scope() as session:
         text = ""
         for poll in (
-            session.query(Poll).filter_by(addr=message.get_sender_contact().addr).all()
+            session.query(Poll).filter_by(addr=message.get_sender_contact().addr).all()  # noqa
         ):
             if len(poll.question) > 100:
-                q = poll.question[:100] + "..."
+                question = poll.question[:100] + "..."
             else:
-                q = poll.question
-            text += f"📊 /{_get_prefix(bot)}get_{poll.id} {q}\n\n"
+                question = poll.question
+            text += f"📊 /{_get_prefix(bot)}get_{poll.id} {question}\n\n"
     replies.add(text=text or "❌ Empty list", chat=message.get_sender_chat())
 
 
@@ -141,10 +142,10 @@ def poll_end(bot: DeltaBot, args: str, message: Message, replies: Replies) -> No
         addr = message.get_sender_contact().addr
         try:
             with session_scope() as session:
-                poll = session.query(Poll).filter_by(id=int(args[0]), addr=addr).one()
+                poll = session.query(Poll).filter_by(id=int(args[0]), addr=addr).one()  # noqa
                 text, html = _format_poll(bot, poll, closed=True)
                 addresses = set(vote.addr for vote in poll.votes)
-                session.delete(poll)
+                session.delete(poll)  # noqa
             addresses.add(addr)
             for addr in addresses:
                 contact = bot.get_contact(addr)
@@ -167,7 +168,7 @@ def poll_vote(bot: DeltaBot, args: str, message: Message, replies: Replies) -> N
         addr = message.get_sender_contact().addr
         try:
             with session_scope() as session:
-                poll = session.query(Poll).filter_by(id=int(args[0])).one()
+                poll = session.query(Poll).filter_by(id=int(args[0])).one()  # noqa
                 if addr in [v.addr for v in poll.votes]:
                     text, html = "❌ You already voted", None
                 elif option_id not in [o.id for o in poll.options]:
