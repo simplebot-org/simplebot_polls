@@ -29,7 +29,6 @@ def deltabot_init(bot: DeltaBot) -> None:
 
     bot.commands.register(func=poll_get, name=f"/{prefix}get")
     bot.commands.register(func=poll_status, name=f"/{prefix}status")
-    bot.commands.register(func=poll_settings, name=f"/{prefix}settings")
     bot.commands.register(func=poll_list, name=f"/{prefix}list")
     bot.commands.register(func=poll_end, name=f"/{prefix}end")
     bot.commands.register(func=poll_vote, name=f"/{prefix}vote")
@@ -97,30 +96,6 @@ def poll_status(bot: DeltaBot, args: str, message: Message, replies: Replies) ->
                     text = "❌ You can't see poll status until you vote"
                     html = None
             replies.add(text=text, html=html, chat=message.get_sender_chat())
-        except NoResultFound:
-            replies.add(
-                text="❌ Invalid poll", quote=message, chat=message.get_sender_chat()
-            )
-    else:
-        replies.add(
-            text="❌ Invalid poll", quote=message, chat=message.get_sender_chat()
-        )
-
-
-def poll_settings(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
-    """Get poll's advanced settings."""
-    if args:
-        try:
-            with session_scope() as session:
-                poll = (
-                    session.query(Poll)
-                    .filter_by(id=int(args[0]), addr=message.get_sender_contact().addr)
-                    .one()
-                )
-                text = f"📊 /{0}get_{1}\n{2}\n\n🛑 /{0}end_{1}".format(
-                    _get_prefix(bot), poll.id, poll.question
-                )
-            replies.add(text=text, chat=message.get_sender_chat())
         except NoResultFound:
             replies.add(
                 text="❌ Invalid poll", quote=message, chat=message.get_sender_chat()
