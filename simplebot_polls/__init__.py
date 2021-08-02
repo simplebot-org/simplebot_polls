@@ -20,6 +20,22 @@ BARS = ["🟩", "🟥", "🟦", "🟪", "🟧", "🟨", "🟫", "⬛"]
 
 
 @simplebot.hookimpl
+def deltabot_init(bot: DeltaBot) -> None:
+    prefix = _get_prefix(bot)
+
+    name = f"/{prefix}new"
+    desc = f"Create a new public poll.\nExamples:\n{name} Do you like polls?\nyes\nno\nmaybe"
+    bot.commands.register(func=poll_new, name=name, help=desc)
+
+    bot.commands.register(func=poll_get, name=f"/{prefix}get")
+    bot.commands.register(func=poll_status, name=f"/{prefix}status")
+    bot.commands.register(func=poll_settings, name=f"/{prefix}settings")
+    bot.commands.register(func=poll_list, name=f"/{prefix}list")
+    bot.commands.register(func=poll_end, name=f"/{prefix}end")
+    bot.commands.register(func=poll_vote, name=f"/{prefix}vote")
+
+
+@simplebot.hookimpl
 def deltabot_start(bot: DeltaBot) -> None:
     path = os.path.join(os.path.dirname(bot.account.db_path), __name__)
     if not os.path.exists(path):
@@ -28,16 +44,7 @@ def deltabot_start(bot: DeltaBot) -> None:
     init(f"sqlite:///{path}")
 
 
-@simplebot.command
 def poll_new(bot: DeltaBot, payload: str, message: Message, replies: Replies) -> None:
-    """Create a new public poll.
-
-    Example:
-    /poll_new Do you like polls?
-    yes
-    no
-    maybe
-    """
     lines = []
     for ln in payload.split("\n"):
         ln = ln.strip()
@@ -60,7 +67,6 @@ def poll_new(bot: DeltaBot, payload: str, message: Message, replies: Replies) ->
     replies.add(text=text, html=html)
 
 
-@simplebot.command
 def poll_get(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
     """Get poll with given id."""
     if args:
@@ -76,7 +82,6 @@ def poll_get(bot: DeltaBot, args: str, message: Message, replies: Replies) -> No
         replies.add(text="❌ Invalid poll", quote=message)
 
 
-@simplebot.command
 def poll_status(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
     """Get poll status."""
     addr = message.get_sender_contact().addr
@@ -102,8 +107,7 @@ def poll_status(bot: DeltaBot, args: str, message: Message, replies: Replies) ->
         )
 
 
-@simplebot.command
-def poll_settings(args: str, message: Message, replies: Replies) -> None:
+def poll_settings(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
     """Get poll's advanced settings."""
     if args:
         try:
@@ -113,8 +117,8 @@ def poll_settings(args: str, message: Message, replies: Replies) -> None:
                     .filter_by(id=int(args[0]), addr=message.get_sender_contact().addr)
                     .one()
                 )
-                text = "📊 /poll_get_{0}\n{1}\n\n🛑 /poll_end_{0}".format(
-                    poll.id, poll.question
+                text = f"📊 /{0}get_{1}\n{2}\n\n🛑 /{0}end_{1}".format(
+                    _get_prefix(bot), poll.id, poll.question
                 )
             replies.add(text=text, chat=message.get_sender_chat())
         except NoResultFound:
@@ -127,8 +131,7 @@ def poll_settings(args: str, message: Message, replies: Replies) -> None:
         )
 
 
-@simplebot.command
-def poll_list(message: Message, replies: Replies) -> None:
+def poll_list(bot: DeltaBot, message: Message, replies: Replies) -> None:
     """Show your public polls."""
     with session_scope() as session:
         text = ""
@@ -139,11 +142,10 @@ def poll_list(message: Message, replies: Replies) -> None:
                 q = poll.question[:100] + "..."
             else:
                 q = poll.question
-            text += "📊 /poll_get_{} {}\n\n".format(poll.id, q)
+            text += f"📊 /{_get_prefix(bot)}get_{poll.id} {q}\n\n"
     replies.add(text=text or "❌ Empty list", chat=message.get_sender_chat())
 
 
-@simplebot.command
 def poll_end(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
     """Close the poll with the given id."""
     if args:
@@ -169,8 +171,7 @@ def poll_end(bot: DeltaBot, args: str, message: Message, replies: Replies) -> No
         )
 
 
-@simplebot.command
-def vote(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
+def poll_vote(bot: DeltaBot, args: str, message: Message, replies: Replies) -> None:
     """Vote in polls."""
     if len(args) == 2:
         option_id = int(args[1])
@@ -220,5 +221,10 @@ def _format_poll(
         percent=lambda opt: vcount
         and len([v for v in poll.votes if v.value == opt.id]) / vcount,
         BARS=BARS,
+        prefix=_get_prefix(bot),
     )
     return text, html
+
+
+def _get_prefix(bot: DeltaBot) -> str:
+    return bot.get("command_prefix", scope=__name__) or ""

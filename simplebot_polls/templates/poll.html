@@ -16,11 +16,11 @@
 	    {{ poll.question }}
 	    {% else %}
 	    <strong>
-		<a href="mailto:{{ bot_addr }}?body=/poll_get_{{ poll.id }}">📊 GET</a> |
-		<a href="mailto:{{ bot_addr }}?body=/poll_status_{{ poll.id }}">STATUS</a>
+		<a href="mailto:{{ bot_addr }}?body=/{{ prefix }}get_{{ poll.id }}">📊 GET</a> |
+		<a href="mailto:{{ bot_addr }}?body=/{{ prefix }}status_{{ poll.id }}">STATUS</a>
 		{% if is_admin %}
 		|
-		<a href="mailto:{{ bot_addr }}?body=/poll_end_{{ poll.id }}">🛑 END</a>
+		<a href="mailto:{{ bot_addr }}?body=/{{ prefix }}end_{{ poll.id }}">🛑 END</a>
 		{% endif %}
 	    </strong>
 	    <br><br>
@@ -34,7 +34,7 @@
 	    {% endfor %}
 	    {% else %}
 	    {% for opt in poll.options %}
-	    <a href="mailto:{{ bot_addr }}?body=/vote_{{ poll.id }}_{{ opt.id }}">{{ opt.text }}</a><br><br>
+	    <a href="mailto:{{ bot_addr }}?body=/{{ prefix }}vote_{{ poll.id }}_{{ opt.id }}">{{ opt.text }}</a><br><br>
 	    {% endfor %}
 	    {% endif %}
 	    [{% if closed %}Finished{% else %}Ongoing{% endif %} - {{ vcount }} votes]
