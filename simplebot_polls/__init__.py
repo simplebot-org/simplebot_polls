@@ -196,9 +196,11 @@ def _format_poll(
     is_admin: bool = False,
 ) -> tuple:
     if closed:
-        text = "📊 POLL RESULTS - {}".format(poll.question)
+        text = f"📊 POLL RESULTS - {poll.question}"
+    elif voted:
+        text = "📊 POLL STATUS - {poll.question}"
     else:
-        text = "📊 POLL - {}".format(poll.question)
+        text = "📊 POLL - {poll.question}"
     vcount = len(poll.votes)
 
     html = template.render(
