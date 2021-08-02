@@ -19,13 +19,13 @@ except DistributionNotFound:
     __version__ = "0.0.0.dev0-unknown"
 COLORS = [
     "#795548",
+    "#f44336",
     "#2196F3",
-    "#9c27b0",
     "#ff9800",
+    "#9c27b0",
     "#4CAF50",
     "#e91e63",
     "#ffeb3b",
-    "#f44336",
     "#3f51b5",
     "#cddc39",
     "#009688",
