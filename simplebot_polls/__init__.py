@@ -39,7 +39,7 @@ def deltabot_init(bot: DeltaBot) -> None:
     prefix = _get_prefix(bot)
 
     name = f"/{prefix}new"
-    desc = f"Create a new public poll.\nExamples:\n{name} Do you like polls?\nyes\nno\nmaybe"
+    desc = f"Create a new public poll.\nExample:\n{name} Do you like polls?\nyes\nno\nmaybe"
     bot.commands.register(func=poll_new, name=name, help=desc)
 
     bot.commands.register(func=poll_get, name=f"/{prefix}get")
