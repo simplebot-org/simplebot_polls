@@ -198,9 +198,9 @@ def _format_poll(
     if closed:
         text = f"📊 POLL RESULTS - {poll.question}"
     elif voted:
-        text = "📊 POLL STATUS - {poll.question}"
+        text = f"📊 POLL STATUS - {poll.question}"
     else:
-        text = "📊 POLL - {poll.question}"
+        text = f"📊 POLL - {poll.question}"
     vcount = len(poll.votes)
 
     html = template.render(
