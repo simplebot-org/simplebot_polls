@@ -3,6 +3,7 @@ import time
 
 import simplebot
 from deltachat import Chat, Contact, Message
+from pkg_resources import DistributionNotFound, get_distribution
 from simplebot import DeltaBot
 from simplebot.bot import Replies
 from sqlalchemy.exc import NoResultFound
@@ -10,7 +11,11 @@ from sqlalchemy.exc import NoResultFound
 from .orm import Option, Poll, Vote, init, session_scope
 from .templates import template
 
-__version__ = "1.0.0"
+try:
+    __version__ = get_distribution(__name__).version
+except DistributionNotFound:
+    # package is not installed
+    __version__ = "0.0.0.dev0-unknown"
 BARS = ["🟩", "🟥", "🟦", "🟪", "🟧", "🟨", "🟫", "⬛"]
 
 
