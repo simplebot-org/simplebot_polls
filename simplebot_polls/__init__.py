@@ -16,7 +16,21 @@ try:
 except DistributionNotFound:
     # package is not installed
     __version__ = "0.0.0.dev0-unknown"
-BARS = ["🟩", "🟥", "🟦", "🟪", "🟧", "🟨", "🟫", "⬛"]
+COLORS = [
+    "#795548",
+    "#2196F3",
+    "#9c27b0",
+    "#ff9800",
+    "#4CAF50",
+    "#e91e63",
+    "#ffeb3b",
+    "#f44336",
+    "#3f51b5",
+    "#cddc39",
+    "#009688",
+    "#ffc107",
+    "#ff5722",
+]
 
 
 @simplebot.hookimpl
@@ -195,7 +209,7 @@ def _format_poll(
         vcount=vcount,
         percent=lambda opt: vcount
         and len([v for v in poll.votes if v.value == opt.id]) / vcount,
-        BARS=BARS,
+        COLORS=COLORS,
         prefix=_get_prefix(bot),
     )
     return text, html
