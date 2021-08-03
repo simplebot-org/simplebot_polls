@@ -36,7 +36,7 @@
 		    {% set p = (percent(opt) * 100)|round|int %}
 		    <strong>{{ p }}%</strong> {{ opt.text }}
 		    <div class="w3-progress-container w3-round-large">
-			<div class="w3-progressbar w3-round-large" style="width:{{ p }}%; background-color: {{ COLORS[opt.id % COLORS|length] }} !important"></div>
+			<div class="w3-progressbar w3-round-large" style="width:{{ p }}%; background-color: {{ COLORS[opt.id % COLORS|length] }}"></div>
 		    </div>
 		    <br>
 		{% endfor %}
