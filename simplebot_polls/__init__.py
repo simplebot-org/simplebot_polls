@@ -5,8 +5,7 @@ import os
 import simplebot
 from deltachat import Message
 from pkg_resources import DistributionNotFound, get_distribution
-from simplebot import DeltaBot
-from simplebot.bot import Replies
+from simplebot.bot import DeltaBot, Replies
 from sqlalchemy.exc import NoResultFound
 
 from .orm import Option, Poll, Vote, init, session_scope
@@ -126,7 +125,9 @@ def poll_list(bot: DeltaBot, message: Message, replies: Replies) -> None:
     with session_scope() as session:
         text = ""
         for poll in (
-            session.query(Poll).filter_by(addr=message.get_sender_contact().addr).all()  # noqa
+            session.query(Poll)
+            .filter_by(addr=message.get_sender_contact().addr)
+            .all()  # noqa
         ):
             if len(poll.question) > 100:
                 question = poll.question[:100] + "..."
@@ -142,7 +143,9 @@ def poll_end(bot: DeltaBot, args: str, message: Message, replies: Replies) -> No
         addr = message.get_sender_contact().addr
         try:
             with session_scope() as session:
-                poll = session.query(Poll).filter_by(id=int(args[0]), addr=addr).one()  # noqa
+                poll = (
+                    session.query(Poll).filter_by(id=int(args[0]), addr=addr).one()
+                )  # noqa
                 text, html = _format_poll(bot, poll, closed=True)
                 addresses = set(vote.addr for vote in poll.votes)
                 session.delete(poll)  # noqa
