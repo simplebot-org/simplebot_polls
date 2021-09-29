@@ -23,7 +23,7 @@ A `SimpleBot`_ plugin that allows to create polls.
 
 If this plugin has collisions with commands from other plugins in your bot, you can set a command prefix like ``/poll_`` for all commands::
 
-  simplebot -a bot@example.com db simplebot_polls/command_prefix poll_
+  simplebot -a bot@example.com db -s simplebot_polls/command_prefix poll_
 
 Install
 -------
